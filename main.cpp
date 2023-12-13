@@ -4,6 +4,7 @@
 #include <vector>
 #include "Util.hpp"
 #include "RoundRobin.hpp"
+#include "TextSched.hpp"
 
 #include <unistd.h>
 
@@ -58,9 +59,15 @@ int main(int argc, char* argv[]) {
     std::getline(file, tempstr);
     int quant = std::stoi(tempstr);
 
-    auto sim = RoundRobin(arrivals, durations, quant);
-    while(sim.running()) {
-        std::cout << sim.next_frame_str() << '\n';
+    auto sim = TextScheduler(
+        std::unique_ptr<Scheduler>(
+            new RoundRobin(arrivals, durations, quant)
+        )
+    );
+
+    while(sim.is_running()) {
+        sim.draw_frame();
+        sleep(1);
     }
 
     return 0;

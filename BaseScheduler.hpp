@@ -1,7 +1,6 @@
 #pragma once
 #include <list>
 #include <vector>
-#include <string>
 #include <tuple>
 
 struct Process
@@ -12,6 +11,8 @@ struct Process
     int time_spent;
 };
 
+class TextScheduler;
+
 class Scheduler {
 public:
     Scheduler(const Scheduler& other) = delete;
@@ -19,13 +20,9 @@ public:
 
     Scheduler(const std::vector<int>& arrivals, const std::vector<int>& durations);
 
-    /**
-     *  @brief Calculates next thing that the scheduler would do
-     *  @return String represenation of what happened
-    */
-    std::string next_frame_str();
-
     inline bool running() { return !done; };
+
+    friend TextScheduler;
 
 protected:
     std::vector<Process> processes;
@@ -54,10 +51,4 @@ protected:
      *  @return tuple (time to the arrival, iterator to process to arrive)
     */
     auto to_arrive() -> std::tuple<int, decltype(processes.begin())>;
-
-    /**
-     *  @brief Shows queue's state
-     *  @return     String representation of queue
-    */
-    std::string queue_str();
 };

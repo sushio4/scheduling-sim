@@ -62,16 +62,3 @@ auto Scheduler::to_arrive() -> decltype(Scheduler::to_arrive()) {
 
     return std::tuple{min, p};
 }
-
-std::string Scheduler::queue_str() {
-    std::string res;
-    for(auto proc : queue) {
-        res += "[P" + std::to_string(proc.id) + "] ";
-    }
-    return res;
-}
-
-std::string Scheduler::next_frame_str() {
-    next_frame();
-    return std::to_string(time) + ":    " + queue_str();
-}

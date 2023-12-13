@@ -4,7 +4,7 @@
 
 class RoundRobin : public Scheduler {
 public:
-    RoundRobin(RoundRobin& other) = delete;
+    RoundRobin(const RoundRobin& other) = delete;
     RoundRobin(RoundRobin&& other) = default;
     /**
      *  @brief  Creates a new RR scheduler simulation

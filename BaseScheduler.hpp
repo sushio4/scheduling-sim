@@ -14,7 +14,7 @@ struct Process
 
 class Scheduler {
 public:
-    Scheduler(Scheduler& other) = delete;
+    Scheduler(const Scheduler& other) = delete;
     Scheduler(Scheduler&& other) = default;
 
     Scheduler(const std::vector<int>& arrivals, const std::vector<int>& durations);

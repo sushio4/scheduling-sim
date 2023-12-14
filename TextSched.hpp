@@ -22,9 +22,18 @@ public:
      *  @brief Draws the next frame of the scheduler
     */
     void draw_frame();
+    /**
+     *  @brief Draws a legend for better understanding
+    */
+    void draw_legend();
+    /**
+     *  @brief Draws a summary for the simulation
+    */
+    void draw_summary();
 
     inline bool is_running() {return !sched->done;}
 
 private:
     std::unique_ptr<Scheduler> sched;
+    std::vector<int> finished;
 };

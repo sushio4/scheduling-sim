@@ -6,8 +6,6 @@
 #include "RoundRobin.hpp"
 #include "TextSched.hpp"
 
-#include <unistd.h>
-
 void display_help();
 
 int main(int argc, char* argv[]) {
@@ -46,6 +44,11 @@ int main(int argc, char* argv[]) {
         }
     }   
 
+    if(flags.help) {
+        display_help();
+        return 0;
+    }
+
     if(!fname) {
         std::cout << "Error: input file not specified!\n";
         display_help();
@@ -56,10 +59,6 @@ int main(int argc, char* argv[]) {
         std::cout << "Error: algorithm not specified!\n";
         display_help();
         return 1;
-    }
-
-    if(flags.help) {
-        display_help();
     }
 
     //parse input file
@@ -87,19 +86,20 @@ int main(int argc, char* argv[]) {
 
     auto sim = TextScheduler(std::make_unique<RoundRobin>(arrivals, durations, quant));
 
+    sim.draw_legend();
     while(sim.is_running()) {
         sim.draw_frame();
-        sleep(1);
     }
+    sim.draw_summary();
 
     return 0;
 }
 
 void display_help() {
-    std::cout << "Usages:\n"
-        "1. schedule -h\n\n"
-        "Shows this message.\n\n"
-        "2. schedule [-r | -f] [input file]\n\n"
+    std::cout << "Usage:\n"
+        "schedule [options] [input file]\n\n"
+        "Available options:\n"
+        "-h shows this message\n"
         "-r corresponds to Round-robin algorithm\n"
         "-f corresponds to FCFS algorithm\n\n"
         "Made by Maciej Suski\n";

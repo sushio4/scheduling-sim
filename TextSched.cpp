@@ -3,7 +3,9 @@
 #include <iostream>
 
 TextScheduler::TextScheduler(std::unique_ptr<Scheduler>&& ptr) :
-    sched(std::move(ptr)) {}
+    sched(std::move(ptr)) {
+    finished.reserve(sched->processes.size());
+}
 
 void TextScheduler::draw_frame() {
     //update
@@ -26,6 +28,8 @@ void TextScheduler::draw_frame() {
         break;
     case EventType::finish_process:
         std::cout << "Process P" << event.pid << " has finished and it's removed from the queue\n";
+        //save who finished
+        finished.push_back(event.pid);
         break;
     default:
         std::cout << "This should not happen. Contact developer: suskimaciej@interia.pl\n";
@@ -53,4 +57,22 @@ void TextScheduler::draw_frame() {
         cout << "[d:" << setw(6) << right << p.duration_time << "]  ";
     }
     cout << "\n\n";
+}
+
+void TextScheduler::draw_legend() {
+    std::cout << "\"time\" stands for time elapsed in the system\n"
+        "\"Pn\" is the process with id n\n"
+        "\"a\" is the arrival time of a process\n"
+        "\"t\" is the time process has been active\n"
+        "\"d\" is the total duration of a process, how long does it take\n\n";
+}
+
+void TextScheduler::draw_summary() {
+    std::cout << "Processes finished with such order:\n";
+    for(auto it = finished.begin(); it < finished.end(); it++) {
+        if(it != finished.begin()) 
+            std::cout << ", ";
+        std::cout << 'P' << *it;
+    }
+    std::cout << "\n\n";
 }

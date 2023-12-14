@@ -17,7 +17,7 @@ public:
     /**
      *  @brief  Calculates next thing that the scheduler would do
     */
-    void next_frame();
+    SchedulerEvent next_frame();
 
 private: 
     int time_quant;

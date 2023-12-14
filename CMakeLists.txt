@@ -6,7 +6,8 @@ add_executable(schedule
     main.cpp
     BaseScheduler.cpp
     Util.cpp
-    RoundRobin.cpp)
+    RoundRobin.cpp
+    TextSched.cpp)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)

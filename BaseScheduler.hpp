@@ -11,6 +11,20 @@ struct Process
     int time_spent;
 };
 
+enum EventType : int{
+    none,
+    add_process,
+    switch_process,
+    finish_process
+};
+
+struct SchedulerEvent 
+{
+    EventType type;
+    int pid;
+    int pid2;
+};
+
 class TextScheduler;
 
 class Scheduler {
@@ -33,7 +47,7 @@ protected:
     /**
      *  @brief Calculates the next event
     */
-    virtual void next_frame() = 0;
+    virtual SchedulerEvent next_frame() = 0;
 
     /**
      *  @brief Looks for processes that should be enqueued

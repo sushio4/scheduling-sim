@@ -12,32 +12,58 @@ void display_help();
 
 int main(int argc, char* argv[]) {
 
-    if(argc < 2 || argc > 3) {
+    char* fname = nullptr;
+    struct {
+        bool roundrobin = false;
+        bool fcfs = false;
+        bool help = false;
+    } flags;
+
+    for(int i = 1; i < argc; i++) {
+        if(argv[i][0] != '-') {
+            if(fname) {
+                std::cout << "Warning: specified filename multiple times! Taking only the 2nd.\n";
+            }
+
+            fname = argv[i];
+            continue;
+        }
+
+        for(auto p = &argv[i][1]; *p != '\0'; p++) {
+            switch(*p) {
+            case 'r':
+                flags.roundrobin = true;
+                break;
+            case 'f':
+                flags.fcfs = true;
+                break;
+            case 'h':
+                flags.help = true;
+                break;
+            default:
+                std::cout << "Warning: unrecognized option: " << *p << '\n';
+            }
+        }
+    }   
+
+    if(!fname) {
+        std::cout << "Error: input file not specified!\n";
         display_help();
         return 1;
     }
 
-    auto arg1 = std::string(argv[1]);
-    
-    if(argc == 2 && arg1 == "-h") {
-        display_help();
-        return 0;
-    }
-
-    if(argc < 3) {
+    if(!flags.roundrobin && !flags.fcfs) {
+        std::cout << "Error: algorithm not specified!\n";
         display_help();
         return 1;
     }
 
-    auto arg2 = std::string(argv[2]);
-
-    if(argc == 3 && (arg1 != "-r" && arg1 != "-f" && arg1 != "-rf" && arg1 != "-fr")) {
+    if(flags.help) {
         display_help();
-        return 1;
     }
 
     //parse input file
-    std::ifstream file(argv[2]);
+    std::ifstream file(fname);
     if(!file) {
         std::cout << "Could not open file: " << argv[2] << '\n';
         return 1;
@@ -59,11 +85,7 @@ int main(int argc, char* argv[]) {
     std::getline(file, tempstr);
     int quant = std::stoi(tempstr);
 
-    auto sim = TextScheduler(
-        std::unique_ptr<Scheduler>(
-            new RoundRobin(arrivals, durations, quant)
-        )
-    );
+    auto sim = TextScheduler(std::make_unique<RoundRobin>(arrivals, durations, quant));
 
     while(sim.is_running()) {
         sim.draw_frame();

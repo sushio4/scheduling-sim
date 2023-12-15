@@ -21,18 +21,18 @@ void TextScheduler::draw_frame() {
 
     switch(event.type) {
     case EventType::add_process:
-        std::cout << "Process P" << event.pid << " arrived at the end of the queue\n";
+        cout << "Process P" << event.pid << " arrived at the end of the queue\n";
         break;
     case EventType::switch_process:
-        std::cout << "Time is up for process P" << event.pid << " and it's switched for P" << event.pid2 << '\n';
+        cout << "Time is up for process P" << event.pid << " and it's switched for P" << event.pid2 << '\n';
         break;
     case EventType::finish_process:
-        std::cout << "Process P" << event.pid << " has finished and it's removed from the queue\n";
+        cout << "Process P" << event.pid << " has finished and it's removed from the queue\n";
         //save who finished
         finished.push_back(event.pid);
         break;
     default:
-        std::cout << "This should not happen. Contact developer: suskimaciej@interia.pl\n";
+        cout << "This should not happen. Contact developer: suskimaciej@interia.pl\n";
         return;
     }
 

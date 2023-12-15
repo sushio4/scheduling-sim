@@ -4,6 +4,7 @@
 #include <vector>
 #include "Util.hpp"
 #include "RoundRobin.hpp"
+#include "FCFS.hpp"
 #include "TextSched.hpp"
 
 void display_help();
@@ -61,6 +62,12 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    if(flags.roundrobin && flags.fcfs) {
+        std::cout << "Error: please choose one algorithm!\n";
+        display_help();
+        return 1;
+    }
+
     //parse input file
     std::ifstream file(fname);
     if(!file) {
@@ -84,7 +91,12 @@ int main(int argc, char* argv[]) {
     std::getline(file, tempstr);
     int quant = std::stoi(tempstr);
 
-    auto sim = TextScheduler(std::make_unique<RoundRobin>(arrivals, durations, quant));
+    TextScheduler sim;
+
+    if(flags.roundrobin)
+        sim = TextScheduler(std::make_unique<RoundRobin>(arrivals, durations, quant));
+    else if(flags.fcfs)
+        sim = TextScheduler(std::make_unique<FCFS>(arrivals, durations));
 
     sim.draw_legend();
     while(sim.is_running()) {

@@ -7,6 +7,7 @@ add_executable(schedule
     BaseScheduler.cpp
     Util.cpp
     RoundRobin.cpp
+    FCFS.cpp
     TextSched.cpp)
 
 set(CMAKE_CXX_STANDARD 17)

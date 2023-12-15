@@ -22,7 +22,7 @@ SchedulerEvent RoundRobin::next_frame() {
     int finish_time = current.duration_time - current.time_spent;
 
     //look for the smallest time 
-    auto result = SchedulerEvent{EventType::none, 0};
+    auto result = SchedulerEvent{EventType::none, 0, 0};
 
     if(arrive_time < finish_time &&
        arrive_time < time_to_change) {

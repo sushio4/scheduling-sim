@@ -9,8 +9,10 @@
 */
 class TextScheduler {
 public:
+    TextScheduler() = default;
     TextScheduler(const TextScheduler& other) = delete;
     TextScheduler(TextScheduler&& other) = default;
+    TextScheduler& operator=(TextScheduler&& other) = default;
 
     /**
      * @brief Constructor taking a pointer to existing Scheduler

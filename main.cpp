@@ -62,12 +62,6 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    if(flags.roundrobin && flags.fcfs) {
-        std::cout << "Error: please choose one algorithm!\n";
-        display_help();
-        return 1;
-    }
-
     //parse input file
     std::ifstream file(fname);
     if(!file) {
@@ -90,19 +84,11 @@ int main(int argc, char* argv[]) {
     std::getline(file, tempstr);
     std::getline(file, tempstr);
     int quant = std::stoi(tempstr);
-
-    TextScheduler sim;
-
+    
+    if(flags.fcfs)
+        TextScheduler::run<FCFS>(arrivals, durations);
     if(flags.roundrobin)
-        sim = TextScheduler(std::make_unique<RoundRobin>(arrivals, durations, quant));
-    else if(flags.fcfs)
-        sim = TextScheduler(std::make_unique<FCFS>(arrivals, durations));
-
-    sim.draw_legend();
-    while(sim.is_running()) {
-        sim.draw_frame();
-    }
-    sim.draw_summary();
+        TextScheduler::run<RoundRobin>(arrivals, durations, quant);
 
     return 0;
 }

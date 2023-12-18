@@ -1,10 +1,12 @@
 #include "TextSched.hpp"
 #include <iomanip>
 #include <iostream>
+#include <numeric>
 
 TextScheduler::TextScheduler(std::unique_ptr<Scheduler>&& ptr) :
     sched(std::move(ptr)) {
     finished.reserve(sched->processes.size());
+    waiting_times.reserve(sched->processes.size());
 }
 
 void TextScheduler::draw_frame() {
@@ -28,6 +30,7 @@ void TextScheduler::draw_frame() {
         break;
     case EventType::finish_process:
         cout << "Process P" << event.pid << " has finished and it's removed from the queue\n";
+        waiting_times.push_back(sched->time - sched->processes[event.pid].arrive_time);
         //save who finished
         finished.push_back(event.pid);
         break;
@@ -74,5 +77,14 @@ void TextScheduler::draw_summary() {
             std::cout << ", ";
         std::cout << 'P' << *it;
     }
-    std::cout << "\n\n";
+    std::cout << "\n\nFinish times in order:\n";
+    for(auto it = waiting_times.begin(); it < waiting_times.end(); it++) {
+        if(it != waiting_times.begin())
+            std::cout << ", ";
+        std::cout << *it;
+    }
+    //calculate average waiting time
+    int sum = std::accumulate(waiting_times.begin(), waiting_times.end(), 0);
+    float avg = (float)sum / (float)waiting_times.size();
+    std::cout << "\nAverage finish time: " << avg << "\n\n";
 }

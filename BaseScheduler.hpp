@@ -2,6 +2,7 @@
 #include <list>
 #include <vector>
 #include <tuple>
+#include <string>
 
 struct Process
 {
@@ -41,6 +42,7 @@ public:
 protected:
     std::vector<Process> processes;
     std::list<Process> queue;
+    std::string name;
     int time = 0;
     bool done = false;
 

@@ -1,8 +1,27 @@
 #pragma once
 #include "BaseScheduler.hpp"
+#include "Util.hpp"
 
 #include <string>
 #include <memory>
+#include <iostream>
+
+enum class TextMode : unsigned char {
+    none    = 0,
+    visual  = 1,
+    frames  = 2,
+    summary = 4,
+    legend  = 8,
+    all     = 15
+};
+
+inline TextMode operator|(TextMode a, TextMode b) {
+    return static_cast<TextMode>(static_cast<unsigned char>(a) | static_cast<unsigned char>(b));
+}
+
+inline unsigned char operator&(TextMode a, TextMode b) {
+    return static_cast<unsigned char>(a) & static_cast<unsigned char>(b);
+}
 
 /**
  * @brief Text ui for scheduler simulations
@@ -19,33 +38,31 @@ public:
      * @param ptr Unique pointer to Scheduler object
     */
     TextScheduler(std::unique_ptr<Scheduler>&& ptr);
+    /**
+     * @brief Constructor that creates appropriate scheduler
+     * @param _args arguments to the consttructor
+    */
+    template<typename Sched, typename... _Args>
+    TextScheduler(tag<Sched>, _Args&&... _args) : 
+        TextScheduler(std::make_unique<Sched>(std::forward<_Args>(_args)...)) 
+    {}
 
     /**
      *  @brief Draws the next frame of the scheduler
     */
-    void draw_frame();
+    void draw_frame(TextMode mode, std::ostream& outstream);
     /**
      *  @brief Draws a legend for better understanding
     */
-    void draw_legend();
+    void draw_legend(std::ostream& outstream);
     /**
      *  @brief Draws a summary for the simulation
     */
-    void draw_summary();
+    void draw_summary(std::ostream& outstream);
 
     inline bool is_running() {return !sched->done;}
 
-    template<typename Sched, typename... _Args>
-    static void run(_Args&&... _args) {
-        auto sim = TextScheduler(std::make_unique<Sched>(std::forward<_Args>(_args)...));
-
-        sim.draw_legend();
-        
-        while(sim.is_running())
-            sim.draw_frame();
-        
-        sim.draw_summary();
-    };
+    void run(TextMode mode = TextMode::all, std::ostream& outstream = std::cout);
 
 private:
     std::unique_ptr<Scheduler> sched;

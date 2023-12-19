@@ -1,6 +1,5 @@
 #include "TextSched.hpp"
 #include <iomanip>
-#include <iostream>
 #include <numeric>
 
 TextScheduler::TextScheduler(std::unique_ptr<Scheduler>&& ptr) :
@@ -9,9 +8,15 @@ TextScheduler::TextScheduler(std::unique_ptr<Scheduler>&& ptr) :
     waiting_times.reserve(sched->processes.size());
 }
 
-void TextScheduler::draw_frame() {
+void TextScheduler::draw_frame(TextMode mode, std::ostream& outstream) {
     //update
     auto event = sched->next_frame();
+
+    if(event.type == EventType::finish_process) {
+        waiting_times.push_back(sched->time - sched->processes[event.pid].arrive_time);
+        //save who finished
+        finished.push_back(event.pid);
+    }
 
     using namespace std;
     /** should look like this
@@ -20,71 +25,82 @@ void TextScheduler::draw_frame() {
      * |  2  |   [t:  02  ]
      *           [d:  12  ]
     */
-
+    if(mode & TextMode::frames)
     switch(event.type) {
     case EventType::add_process:
-        cout << "Process P" << event.pid << " arrived at the end of the queue\n";
+        outstream << "Process P" << event.pid << " arrived at the end of the queue\n";
         break;
     case EventType::switch_process:
-        cout << "Time is up for process P" << event.pid << " and it's switched for P" << event.pid2 << '\n';
+        outstream << "Time is up for process P" << event.pid << " and it's switched for P" << event.pid2 << '\n';
         break;
     case EventType::finish_process:
-        cout << "Process P" << event.pid << " has finished and it's removed from the queue\n";
-        waiting_times.push_back(sched->time - sched->processes[event.pid].arrive_time);
-        //save who finished
-        finished.push_back(event.pid);
+        outstream << "Process P" << event.pid << " has finished and it's removed from the queue\n";
         break;
     default:
-        cout << "This should not happen. Contact developer: suskimaciej@interia.pl\n";
+        outstream << "This should not happen. Contact developer: suskimaciej@interia.pl\n";
         return;
     }
 
+    if(!(mode & TextMode::visual)) return;
     //first line
-    cout << "\n          ";
+    outstream << "\n          ";
     for(auto p : sched->queue) {
-        cout << "[   P" << setw(4) << left << p.id << "]  ";
+        outstream << "[   P" << setw(4) << left << p.id << "]  ";
     }
     //2nd
-    cout << "\n|time |   ";
+    outstream << "\n|time |   ";
     for(auto p : sched->queue) {
-        cout << "[a:" << setw(6) << right << p.arrive_time << "]  ";
+        outstream << "[a:" << setw(6) << right << p.arrive_time << "]  ";
     }
     //3rd
-    cout << "\n|" << setw(5) << left << sched->time << "|   ";
+    outstream << "\n|" << setw(5) << left << sched->time << "|   ";
     for(auto p :sched->queue) {
-        cout << "[t:" << setw(6) << right << p.time_spent << "]  ";
+        outstream << "[t:" << setw(6) << right << p.time_spent << "]  ";
     }
     //4th
-    cout << "\n          ";
+    outstream << "\n          ";
     for(auto p : sched->queue) {
-        cout << "[d:" << setw(6) << right << p.duration_time << "]  ";
+        outstream << "[d:" << setw(6) << right << p.duration_time << "]  ";
     }
-    cout << "\n\n";
+    outstream << "\n\n";
 }
 
-void TextScheduler::draw_legend() {
-    std::cout << "\"time\" stands for time elapsed in the system\n"
+void TextScheduler::draw_legend(std::ostream& outstream) {
+    outstream << "\"time\" stands for time elapsed in the system\n"
         "\"Pn\" is the process with id n\n"
         "\"a\" is the arrival time of a process\n"
         "\"t\" is the time process has been active\n"
         "\"d\" is the total duration of a process, how long does it take\n\n";
 }
 
-void TextScheduler::draw_summary() {
-    std::cout << "Processes finished with such order:\n";
+void TextScheduler::draw_summary(std::ostream& outstream) {
+    outstream << "Processes finished with such order:\n";
     for(auto it = finished.begin(); it < finished.end(); it++) {
         if(it != finished.begin()) 
-            std::cout << ", ";
-        std::cout << 'P' << *it;
+            outstream << ", ";
+        outstream << 'P' << *it;
     }
-    std::cout << "\n\nFinish times in order:\n";
+    outstream << "\n\nFinish times in order:\n";
     for(auto it = waiting_times.begin(); it < waiting_times.end(); it++) {
         if(it != waiting_times.begin())
-            std::cout << ", ";
-        std::cout << *it;
+            outstream << ", ";
+        outstream << *it;
     }
     //calculate average waiting time
     int sum = std::accumulate(waiting_times.begin(), waiting_times.end(), 0);
     float avg = (float)sum / (float)waiting_times.size();
-    std::cout << "\nAverage finish time: " << avg << "\n\n";
+    outstream << "\nAverage finish time: " << avg << "\n\n";
 }
+
+void TextScheduler::run(TextMode mode, std::ostream& outstream) {
+    outstream << "----Running algorithm: " << sched->name << "----\n\n";
+
+    if(mode & TextMode::legend)
+        draw_legend(outstream);
+    
+    while(is_running())
+        draw_frame(mode, outstream);
+    
+    if(mode & TextMode::summary)
+        draw_summary(outstream);
+};

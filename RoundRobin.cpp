@@ -5,6 +5,7 @@ RoundRobin::RoundRobin(const std::vector<int>& arrivals, const std::vector<int>&
     time_quant(time_quant) {
 
     time_to_change = time_quant;
+    name = "Round-Robin";
 }
 
 SchedulerEvent RoundRobin::next_frame() {

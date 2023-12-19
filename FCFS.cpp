@@ -1,7 +1,9 @@
 #include "FCFS.hpp"
 
 FCFS::FCFS(const std::vector<int>& arrivals, const std::vector<int>& durations) :
-    Scheduler(arrivals, durations) {}
+    Scheduler(arrivals, durations) {
+    name = "FCFS";
+}
 
 SchedulerEvent FCFS::next_frame() {
     auto tup = to_arrive();

@@ -12,10 +12,12 @@ void display_help();
 int main(int argc, char* argv[]) {
 
     char* fname = nullptr;
+    char* outfname = nullptr;
     struct {
         bool roundrobin = false;
         bool fcfs = false;
         bool help = false;
+        bool all = false;
     } flags;
 
     for(int i = 1; i < argc; i++) {
@@ -25,6 +27,13 @@ int main(int argc, char* argv[]) {
             }
 
             fname = argv[i];
+            continue;
+        }
+
+        if(std::string("-a") == argv[i]) {
+            i++;
+            flags.all = true;
+            outfname = argv[i];
             continue;
         }
 
@@ -40,7 +49,7 @@ int main(int argc, char* argv[]) {
                 flags.help = true;
                 break;
             default:
-                std::cout << "Warning: unrecognized option: " << *p << '\n';
+                std::cout << "Warning: unrecognized option: " << argv[i] << '\n';
             }
         }
     }   
@@ -56,7 +65,8 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    if(!flags.roundrobin && !flags.fcfs) {
+    if(!flags.roundrobin && !flags.fcfs &&
+        !flags.all) {
         std::cout << "Error: algorithm not specified!\n";
         display_help();
         return 1;
@@ -65,7 +75,14 @@ int main(int argc, char* argv[]) {
     //parse input file
     std::ifstream file(fname);
     if(!file) {
-        std::cout << "Could not open file: " << argv[2] << '\n';
+        std::cout << "Could not open file: " << fname << '\n';
+        return 1;
+    }
+
+    //open output file
+    std::ofstream ofile(outfname);
+    if(!ofile && flags.all) {
+        std::cout << "Could not open file: " << outfname << '\n';
         return 1;
     }
 
@@ -84,11 +101,17 @@ int main(int argc, char* argv[]) {
     std::getline(file, tempstr);
     std::getline(file, tempstr);
     int quant = std::stoi(tempstr);
+
+    if(flags.all) {
+        TextScheduler(tag<FCFS>{}, arrivals, durations).run(TextMode::summary, ofile);
+        TextScheduler(tag<RoundRobin>{}, arrivals, durations, quant).run(TextMode::summary, ofile);
+        return 0;
+    }
     
     if(flags.fcfs)
-        TextScheduler::run<FCFS>(arrivals, durations);
+        TextScheduler(tag<FCFS>{}, arrivals, durations).run();
     if(flags.roundrobin)
-        TextScheduler::run<RoundRobin>(arrivals, durations, quant);
+        TextScheduler(tag<RoundRobin>{}, arrivals, durations, quant).run();
 
     return 0;
 }
@@ -98,6 +121,7 @@ void display_help() {
         "schedule [options] [input file]\n\n"
         "Available options:\n"
         "-h shows this message\n"
+        "-a [FILE] uses all algorithms and compares them in a FILE"
         "-r corresponds to Round-robin algorithm\n"
         "-f corresponds to FCFS algorithm\n\n"
         "Made by Maciej Suski\n";

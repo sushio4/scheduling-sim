@@ -7,7 +7,7 @@ public:
     FCFS(const FCFS& other) = delete;
     FCFS(FCFS&& other) = default;
     /**
-     *  @brief  Creates a new RR scheduler simulation
+     *  @brief  Creates a new FCFS scheduler simulation
      *  @param arrivals     Times at which processes arrive
      *  @param durations    Durations of all processes
     */

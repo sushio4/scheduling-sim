@@ -6,8 +6,12 @@
 
 struct Process
 {
+    inline bool operator==(const Process& other) {
+        return id == other.id;
+    }
     int arrive_time;
     int duration_time;
+    int priority;
     int id;
     int time_spent;
 };
@@ -16,7 +20,10 @@ enum EventType : int{
     none,
     add_process,
     switch_process,
-    finish_process
+    finish_process,
+    add_switch,
+    starve,
+    starve_switch
 };
 
 struct SchedulerEvent 
@@ -49,7 +56,7 @@ protected:
     /**
      *  @brief Calculates the next event
     */
-    virtual SchedulerEvent next_frame() = 0;
+    virtual auto next_frame() -> SchedulerEvent = 0;
 
     /**
      *  @brief Looks for processes that should be enqueued

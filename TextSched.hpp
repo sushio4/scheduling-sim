@@ -62,10 +62,27 @@ public:
 
     inline bool is_running() {return !sched->done;}
 
-    void run(TextMode mode = TextMode::all, std::ostream& outstream = std::cout);
+    /** 
+     * @brief runs the simulation
+     * @param mode indicates what information shall be printed
+     * @param outstream points where to print information
+     * @return returns itself to allow method chaining
+    */
+    auto run(TextMode mode = TextMode::all, std::ostream& outstream = std::cout) -> TextScheduler&;
+
+    /**
+     * @brief returns average waiting time of threads
+     * @param avg_wait reference to where to store it
+     * @return returns itself to allow method chaining
+    */
+    inline TextScheduler& get_avg_wait(float& avg_wait) {
+        avg_wait = average_wait;
+        return *this;
+    };
 
 private:
     std::unique_ptr<Scheduler> sched;
     std::vector<int> finished;
     std::vector<int> waiting_times;
+    float average_wait = 0;
 };

@@ -36,6 +36,15 @@ void TextScheduler::draw_frame(TextMode mode, std::ostream& outstream) {
     case EventType::finish_process:
         outstream << "Process P" << event.pid << " has finished and it's removed from the queue\n";
         break;
+    case EventType::add_switch:
+        outstream << "Process P" << event.pid2 << " arrived and pre-empted P" << event.pid << '\n';
+        break;
+    case EventType::starve:
+        outstream << "Waiting processes have been starved\n";
+        break;
+    case EventType::starve_switch:
+        outstream << "Waiting processes have been starved. Switching execution to P" << event.pid << '\n';
+        break;
     default:
         outstream << "This should not happen. Contact developer: suskimaciej@interia.pl\n";
         return;
@@ -61,6 +70,11 @@ void TextScheduler::draw_frame(TextMode mode, std::ostream& outstream) {
     outstream << "\n          ";
     for(auto p : sched->queue) {
         outstream << "[d:" << setw(6) << right << p.duration_time << "]  ";
+    }
+    //5th
+    outstream << "\n          ";
+    for(auto p : sched->queue) {
+        outstream << "[p:" << setw(6) << right << p.priority << "]  ";
     }
     outstream << "\n\n";
 }
@@ -88,11 +102,11 @@ void TextScheduler::draw_summary(std::ostream& outstream) {
     }
     //calculate average waiting time
     int sum = std::accumulate(waiting_times.begin(), waiting_times.end(), 0);
-    float avg = (float)sum / (float)waiting_times.size();
-    outstream << "\nAverage finish time: " << avg << "\n\n";
+    average_wait = (float)sum / (float)waiting_times.size();
+    outstream << "\n\nAverage finish time: " << average_wait << "\n\n";
 }
 
-void TextScheduler::run(TextMode mode, std::ostream& outstream) {
+TextScheduler& TextScheduler::run(TextMode mode, std::ostream& outstream) {
     outstream << "----Running algorithm: " << sched->name << "----\n\n";
 
     if(mode & TextMode::legend)
@@ -103,4 +117,6 @@ void TextScheduler::run(TextMode mode, std::ostream& outstream) {
     
     if(mode & TextMode::summary)
         draw_summary(outstream);
+
+    return *this;
 };

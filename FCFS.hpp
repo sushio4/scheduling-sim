@@ -16,5 +16,5 @@ public:
     /**
      *  @brief  Calculates next thing that the scheduler would do
     */
-    SchedulerEvent next_frame();
+    auto next_frame() -> SchedulerEvent;
 };

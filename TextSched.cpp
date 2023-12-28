@@ -28,28 +28,27 @@ void TextScheduler::draw_frame(TextMode mode, std::ostream& outstream) {
     if(mode & TextMode::frames)
     switch(event.type) {
     case EventType::add_process:
-        outstream << "Process P" << event.pid << " arrived at the end of the queue\n";
+        outstream << "Process P" << event.pid << " arrived at the end of the queue\n\n";
         break;
     case EventType::switch_process:
-        outstream << "Time is up for process P" << event.pid << " and it's switched for P" << event.pid2 << '\n';
+        outstream << "Time is up for process P" << event.pid << " and it's switched for P" << event.pid2 << "\n\n";
         break;
     case EventType::finish_process:
-        outstream << "Process P" << event.pid << " has finished and it's removed from the queue\n";
+        outstream << "Process P" << event.pid << " has finished and it's removed from the queue\n\n";
         break;
     case EventType::add_switch:
-        outstream << "Process P" << event.pid2 << " arrived and pre-empted P" << event.pid << '\n';
+        outstream << "Process P" << event.pid2 << " arrived and pre-empted P" << event.pid << "\n\n";
         break;
     case EventType::starve:
         outstream << "Waiting processes have been starved\n";
         break;
     case EventType::starve_switch:
-        outstream << "Waiting processes have been starved. Switching execution to P" << event.pid << '\n';
+        outstream << "Waiting processes have been starved. Switching execution to P" << event.pid << "\n\n";
         break;
     default:
-        outstream << "This should not happen. Contact developer: suskimaciej@interia.pl\n";
+        outstream << "This should not happen. Contact developer: suskimaciej@interia.pl\n\n";
         return;
     }
-    outstream << '\n';
 
     if(!(mode & TextMode::visual)) return;
     //first line

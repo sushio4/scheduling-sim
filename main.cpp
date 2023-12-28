@@ -158,14 +158,21 @@ int main(int argc, char* argv[]) {
             return a.second < b.second;
         });
 
-        std::cout << "Waiting times for all algorithms:\n";
-        for(auto p : wait_table) {
-            std::cout << std::setw(12) << std::left << p.first << '|' 
-                << std::setw(10) << std::right << p.second << '\n';
-        }
+        auto comparison = [&wait_table](std::ostream& o) {
+            o << "\nWaiting times for all algorithms:\n";
+            for(auto p : wait_table) {
+                o << std::setw(12) << std::left << p.first << '|' 
+                    << std::setw(10) << std::right << p.second << '\n';
+            }
+            o << "\nThe best algorithm for this particular case was " << wait_table[0].first << "\n\n";
+        };
 
-        if(ofile)
+        comparison(output);
+
+        if(ofile){
+            comparison(std::cout);
             ofile.close();
+        }
 
         return 0;
     }

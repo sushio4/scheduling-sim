@@ -49,10 +49,11 @@ void TextScheduler::draw_frame(TextMode mode, std::ostream& outstream) {
         outstream << "This should not happen. Contact developer: suskimaciej@interia.pl\n";
         return;
     }
+    outstream << '\n';
 
     if(!(mode & TextMode::visual)) return;
     //first line
-    outstream << "\n          ";
+    outstream << "          ";
     for(auto p : sched->queue) {
         outstream << "[   P" << setw(4) << left << p.id << "]  ";
     }
@@ -71,20 +72,27 @@ void TextScheduler::draw_frame(TextMode mode, std::ostream& outstream) {
     for(auto p : sched->queue) {
         outstream << "[d:" << setw(6) << right << p.duration_time << "]  ";
     }
-    //5th
-    outstream << "\n          ";
-    for(auto p : sched->queue) {
-        outstream << "[p:" << setw(6) << right << p.priority << "]  ";
+    //5th (optional)
+    if(mode & TextMode::show_priority) {
+        outstream << "\n          ";
+        for(auto p : sched->queue) {
+            outstream << "[p:" << setw(6) << right << p.priority << "]  ";
+        }
     }
     outstream << "\n\n";
 }
 
-void TextScheduler::draw_legend(std::ostream& outstream) {
+void TextScheduler::draw_legend(TextMode mode, std::ostream& outstream) {
     outstream << "\"time\" stands for time elapsed in the system\n"
         "\"Pn\" is the process with id n\n"
         "\"a\" is the arrival time of a process\n"
         "\"t\" is the time process has been active\n"
-        "\"d\" is the total duration of a process, how long does it take\n\n";
+        "\"d\" is the total duration of a process, how long does it take\n";
+
+    if(mode & TextMode::show_priority)
+        outstream << "\"p\" is the priority of a process\n\n";
+    else
+        outstream << '\n';
 }
 
 void TextScheduler::draw_summary(std::ostream& outstream) {
@@ -110,7 +118,7 @@ TextScheduler& TextScheduler::run(TextMode mode, std::ostream& outstream) {
     outstream << "----Running algorithm: " << sched->name << "----\n\n";
 
     if(mode & TextMode::legend)
-        draw_legend(outstream);
+        draw_legend(mode, outstream);
     
     while(is_running())
         draw_frame(mode, outstream);

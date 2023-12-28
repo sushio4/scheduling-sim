@@ -24,6 +24,7 @@ int main(int argc, char* argv[]) {
         bool all = false;
         bool file = false;
         bool visual = false;
+        bool visualplus = false;
     } flags;
 
     for(int i = 1; i < argc; i++) {
@@ -57,7 +58,10 @@ int main(int argc, char* argv[]) {
                 outfname = argv[++i];
                 break;
             case 'v':
-                flags.visual = true;
+                if(!flags.visual)
+                    flags.visual = true;
+                else
+                    flags.visualplus = true;
                 break;
             case 'a':
                 flags.all = true;
@@ -101,6 +105,12 @@ int main(int argc, char* argv[]) {
     }
     std::ostream& output = flags.file ? ofile : std::cout;
 
+    TextMode mode = TextMode::summary;
+    if(flags.visual) 
+        mode = mode | TextMode::frames;
+    if(flags.visualplus)
+        mode = TextMode::all;
+
     std::vector<int> arrivals;
     std::vector<int> durations;
     std::vector<int> priorities;
@@ -132,15 +142,15 @@ int main(int argc, char* argv[]) {
         }};
 
         TextScheduler(tag<FCFS>{}, arrivals, durations)
-            .run(TextMode::summary, ofile)
+            .run(mode, output)
             .get_avg_wait(wait_table[0].second);
 
         TextScheduler(tag<RoundRobin>{}, arrivals, durations, quant)
-            .run(TextMode::summary, ofile)
+            .run(mode, output)
             .get_avg_wait(wait_table[1].second);
 
         TextScheduler(tag<Priority>{}, arrivals, durations, priorities, starvation)
-            .run(TextMode::summary, ofile)
+            .run(mode | TextMode::show_priority, output)
             .get_avg_wait(wait_table[2].second);
 
         //sort waiting times in order to compare them
@@ -162,13 +172,13 @@ int main(int argc, char* argv[]) {
     
     if(flags.fcfs)
         TextScheduler(tag<FCFS>{}, arrivals, durations)
-            .run();
+            .run(mode, output);
     if(flags.roundrobin)
         TextScheduler(tag<RoundRobin>{}, arrivals, durations, quant)
-            .run();
+            .run(mode, output);
     if(flags.priority)
         TextScheduler(tag<Priority>{}, arrivals, durations, priorities, starvation)
-            .run();
+            .run(mode | TextMode::show_priority, output);
 
     if(ofile)
         ofile.close();
@@ -182,7 +192,7 @@ void display_help() {
         "Available options:\n"
         "-h shows this message\n"
         "-f [FILE] stores info in a FILE\n"
-        "-v visual\n"
+        "-v shows every step, enter vv for graphical represenation\n"
         "-a selects all algorithms and compares them\n"
         "\nAlgorithms:\n"
         "-R corresponds to Round-robin algorithm\n"

@@ -14,6 +14,7 @@ Scheduler::Scheduler(const std::vector<int>& arrivals, const std::vector<int>& d
         proc.duration_time = durations[i];
         proc.id = i;
         proc.time_spent = 0;
+        proc.priority = 0;
 
         processes.push_back(proc);
     } 

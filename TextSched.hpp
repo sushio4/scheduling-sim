@@ -12,7 +12,8 @@ enum class TextMode : unsigned char {
     frames  = 2,
     summary = 4,
     legend  = 8,
-    all     = 15
+    all     = 15,
+    show_priority = 16
 };
 
 inline TextMode operator|(TextMode a, TextMode b) {
@@ -54,7 +55,7 @@ public:
     /**
      *  @brief Draws a legend for better understanding
     */
-    void draw_legend(std::ostream& outstream);
+    void draw_legend(TextMode mode, std::ostream& outstream);
     /**
      *  @brief Draws a summary for the simulation
     */

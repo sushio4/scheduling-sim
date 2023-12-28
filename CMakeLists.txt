@@ -8,6 +8,7 @@ add_executable(schedule
     Util.cpp
     RoundRobin.cpp
     FCFS.cpp
+    Priority.cpp
     TextSched.cpp)
 
 set(CMAKE_CXX_STANDARD 17)

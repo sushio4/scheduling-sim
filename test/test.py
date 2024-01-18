@@ -5,7 +5,7 @@ from sys import argv
 # this script is for automatic tests
 
 def make_input(filename):
-    procnum = random.randrange(5, 25)
+    procnum = random.randrange(15, 30)
     f = open(filename, "w")
 
     def writernd(a, b):
